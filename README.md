@@ -4,3 +4,5 @@ Código do primeiro projeto da materia de introdução a internet das coisas. Es
 Bibliotecas necessarioas:
 - Dht Sensor Library
 - Adafruit Unified Sensor
+- Esp32
+- Wifi
