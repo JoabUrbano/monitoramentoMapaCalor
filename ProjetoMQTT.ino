@@ -31,8 +31,8 @@ int wifi_timeout = 100000;
 const int mqtt_port = 1883;
 int mqtt_timeout = 10000;
 
-#define mqtt_usernameAdafruitIO "Joab_Urbano"
-#define mqtt_keyAdafruitIO "aio_mVdl92oNiSTLQxiTKRH3ixlxcOgu"
+#define mqtt_usernameAdafruitIO "USER"
+#define mqtt_keyAdafruitIO "KEY"
 
 /***** Configuração dos feeds *****/
 Adafruit_MQTT_Client mqtt(&wifi_client, mqtt_broker, mqtt_port, mqtt_usernameAdafruitIO, mqtt_usernameAdafruitIO, mqtt_keyAdafruitIO);
