@@ -1,16 +1,24 @@
-# projetoIntroducaoIot01
-Código do primeiro projeto da materia de introdução a internet das coisas. Esse projeto consiste em um controlador de temperatura com mais de um sensor DHT11 para garantir a redundância dos dados e possibilitar a criação de uma aproximação de mapa de calor.
+# Monitoramento de Mapa de calor
+Projeto que visa monitorar ambientes e produzir dados para mapas de calor. Os sensores são todos lidos pelo arduino mega e os que estiverem com valores validos são enviados via serial para o esp32, para que ele possa enviar esses dados via MQTT.
 
 Componentes utilizados:
 - Esp32 dev module
+- Arduino mega
 - Protoboard
 - Jumpers
 - Dois sensores DHT11
 - Dois resistores de 1kOhm
 
-Bibliotecas necessarioas:
-- Dht Sensor Library
+<h3>Bibliotecas necessarioas</h3>
+Esp32:
 - Adafruit Unified Sensor
 - Esp32
 - Wifi
 - Adafruit MQTT Library
+
+Arduino Mega:
+- Dht Sensor Library
+
+<h3>Autores</h3>
+<a href="https://github.com/JoabUrbano">Joab Urbano</a><br>
+Davi Gibson
