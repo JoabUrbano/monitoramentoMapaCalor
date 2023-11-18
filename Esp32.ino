@@ -6,6 +6,10 @@
 #include "Adafruit_MQTT.h"
 #include "Adafruit_MQTT_Client.h"
 
+#include <SoftwareSerial.h>
+
+SoftwareSerial transmissor(D6, D7); // D6 receptor e D7 transmissor ou 16,17
+
 /***** Variaveis para conexão MQTT *****/
 
 WiFiClient wifi_client;
@@ -49,6 +53,8 @@ void setup()
     WiFi.begin(wifi_ssid, wifi_password);
     connectWiFi();
     mqtt_client.setServer(mqtt_broker, mqtt_port);
+
+    transmissor.begin(9600);
 }
 
 void loop()
@@ -68,7 +74,17 @@ void loop()
     humidadeTopico01.publish(humidade01);
     humidadeTopico02.publish(humidade02);
     */
-    delay(20000);
+
+    // Começar a comunicação serial aqui
+    if (transmissor.avaliable())
+    {
+        Serial.write(transmissor.read());
+    }
+    if (Serial.avaliable())
+    {
+        transmissor.write("a");
+    }
+    delay(1000);
 }
 
 // Função para conectar o Esp ao Wifi

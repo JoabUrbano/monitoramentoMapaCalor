@@ -1,5 +1,10 @@
 #include "DHT.h"
 #include <stdlib.h>
+#include <SoftwareSerial.h>
+
+SoftwareSerial coletorDados(A9, A10); // A9 receptor e A10 transmissor
+
+/* Struct que armazenará os dados */
 
 struct dados
 {
@@ -10,17 +15,17 @@ struct dados
 
 typedef struct dados Dados;
 
-/***** Definições de variaveis *****/
+/***** Definições dos sensores DHTs *****/
 
 #define DHT_PIN01 A0
 #define DHT_PIN02 A1
-#define DHT_PIN03 A3
-#define DHT_PIN04 A4
-#define DHT_PIN05 A5
-#define DHT_PIN06 A6
-#define DHT_PIN07 A7
-#define DHT_PIN08 A8
-#define DHT_PIN09 A9
+#define DHT_PIN03 A2
+#define DHT_PIN04 A3
+#define DHT_PIN05 A4
+#define DHT_PIN06 A5
+#define DHT_PIN07 A6
+#define DHT_PIN08 A7
+#define DHT_PIN09 A8
 
 #define DHTTYPE DHT11
 
@@ -48,6 +53,10 @@ void setup()
   dht07.begin();
   dht08.begin();
   dht09.begin();
+
+  Serial.println("Sensores iniciados!");
+
+  coletorDados.begin(9600);
 }
 
 void loop()
@@ -135,6 +144,14 @@ void loop()
   }
 
   // Começar a comunicação serial aqui
+  if(coletorDados.avaliable())
+  {
+    Serial.write(coletorDados.read());
+  }
+  if(Serial.avaliable())
+  {
+    coletorDados.write("a");
+  }
 
   delay(1000);
 }

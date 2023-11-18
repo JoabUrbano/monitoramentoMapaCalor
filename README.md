@@ -15,9 +15,11 @@ Esp32:
 - Esp32
 - Wifi
 - Adafruit MQTT Library
+- SoftwareSerial
 
 Arduino Mega:
 - Dht Sensor Library
+- SoftwareSerial
 
 <h3>Autores</h3>
 <a href="https://github.com/JoabUrbano">Joab Urbano</a><br>
