@@ -14,8 +14,9 @@ Esp32:
 - Adafruit Unified Sensor
 - Esp32
 - Wifi
+- NTPClient
 - Adafruit MQTT Library
-- SoftwareSerial
+- SPIFFS
 
 Arduino Mega:
 - Dht Sensor Library

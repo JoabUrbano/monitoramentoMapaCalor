@@ -17,15 +17,15 @@ typedef struct dados Dados;
 
 /***** Definições dos sensores DHTs *****/
 
-#define DHT_PIN01 A0
-#define DHT_PIN02 A1
-#define DHT_PIN03 A2
-#define DHT_PIN04 A3
-#define DHT_PIN05 A4
-#define DHT_PIN06 A5
-#define DHT_PIN07 A6
-#define DHT_PIN08 A7
-#define DHT_PIN09 A8
+#define DHT_PIN01 24
+#define DHT_PIN02 26
+#define DHT_PIN03 28
+#define DHT_PIN04 30
+#define DHT_PIN05 32
+#define DHT_PIN06 34
+#define DHT_PIN07 36
+#define DHT_PIN08 38
+#define DHT_PIN09 40
 
 #define DHTTYPE DHT11
 
@@ -144,14 +144,60 @@ void loop()
   }
 
   // Começar a comunicação serial aqui
-  if(coletorDados.avaliable())
+  if(coletorDados.available())
   {
     Serial.write(coletorDados.read());
   }
-  if(Serial.avaliable())
+  if(Serial.available())
   {
     coletorDados.write("a");
   }
 
-  delay(1000);
+  Serial.println("----------------------------------------------------------------------------");
+  Serial.println("DHT 01");
+  Serial.println(dados01.funcionando);
+  Serial.println(dados01.temperatura);
+  Serial.println(dados01.humidade);
+
+  Serial.println("DHT 02");
+  Serial.println(dados02.funcionando);
+  Serial.println(dados02.temperatura);
+  Serial.println(dados02.humidade);
+
+  Serial.println("DHT 03");
+  Serial.println(dados03.funcionando);
+  Serial.println(dados03.temperatura);
+  Serial.println(dados03.humidade);
+
+  Serial.println("DHT 04");
+  Serial.println(dados04.funcionando);
+  Serial.println(dados04.temperatura);
+  Serial.println(dados04.humidade);
+
+  Serial.println("DHT 05");
+  Serial.println(dados05.funcionando);
+  Serial.println(dados05.temperatura);
+  Serial.println(dados05.humidade);
+
+  Serial.println("DHT 06");
+  Serial.println(dados06.funcionando);
+  Serial.println(dados06.temperatura);
+  Serial.println(dados06.humidade);
+
+  Serial.println("DHT 07");
+  Serial.println(dados07.funcionando);
+  Serial.println(dados07.temperatura);
+  Serial.println(dados07.humidade);
+
+  Serial.println("DHT 08");
+  Serial.println(dados08.funcionando);
+  Serial.println(dados08.temperatura);
+  Serial.println(dados08.humidade);
+
+  Serial.println("DHT 09");
+  Serial.println(dados09.funcionando);
+  Serial.println(dados09.temperatura);
+  Serial.println(dados09.humidade);
+
+  delay(5000);
 }
