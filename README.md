@@ -17,6 +17,8 @@ Esp32:
 - NTPClient
 - Adafruit MQTT Library
 - SPIFFS
+- Fs
+- queue
 
 Arduino Mega:
 - Dht Sensor Library

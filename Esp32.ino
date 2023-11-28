@@ -6,6 +6,10 @@
 #include <Adafruit_MQTT_Client.h>
 #include <NTPClient.h>
 #include "SPIFFS.h"
+#include <FS.h>
+#include <queue>
+
+std::queue<String> filaDeStrings;
 
 #define RXpin 16
 #define TXpin 17
@@ -29,6 +33,7 @@ int mqtt_timeout = 10000;
 /* NTP */
 WiFiUDP udp;
 NTPClient ntp(udp, "a.st1.ntp.br", -3 * 3600, 60000); // Cria um objeto "NTP" com as configurações utilizadas no Brasil
+String hora;
 
 int nowTime, oldTime = 0;
 
@@ -46,8 +51,8 @@ void connectWiFi();
 void connectMQTT();
 
 /* Funções de interação com arquivos */
-void writeFile(String state, String path);
-String readFile(String path);
+void writeFile(String state, String hora, String path);
+void readFile(String path);
 void formatFile();
 void openFS(void);
 
@@ -142,75 +147,80 @@ void connectMQTT()
     Serial.println();
 }
 
-/* Funções de interação com arquivo */
-void writeFile(String state, String path)
+/* Funções de interação arquivos ESP */
+
+void writeFile(String state, String path, String hora)
 {
-    File rFile = SPIFFS.open(path, "r+"); // 'r+' para leitura e escrita
-    if (!rFile)
-    {
-        Serial.println("Erro ao abrir arquivo!");
-        return;
-    }
+  while (!filaDeStrings.empty())
+  {
+    filaDeStrings.pop();
+  }
+  
+  readFile(path);
+  File rFile = SPIFFS.open(path, "w");
 
-    rFile.seek(0); // Mover o cursor para o início do arquivo
+  if (!rFile)
+  {
+    Serial.println("Erro ao abrir arquivo!");
+    return;
+  }
+  filaDeStrings.push(state + "," + hora);
 
-    int lineCount = 0;
-    String lines[maxLines];
+  // Escrever no arquivo
+  while (filaDeStrings.size() > maxLines)
+  {
+    filaDeStrings.pop();
+  }
+  while (!filaDeStrings.empty())
+  {
+    rFile.println(filaDeStrings.front());
+    filaDeStrings.pop();
+  }
 
-    // Ler linhas do arquivo
-    while (rFile.position() < rFile.size())
-    {
-        lines[lineCount] = rFile.readStringUntil('\n');
-        lineCount++;
-    }
-
-    rFile.seek(0); // Mover o cursor para o início do arquivo
-
-    if (lineCount / 2 >= maxLines)                             // Se atingir o máximo de elementos, sobrescrever a partir da segunda entrada
-        rFile.seek(lines[2].length() + lines[3].length() + 4); // 4 é a quantidade de caracteres adicionados por println
-
-    // Escrever no arquivo
-    rFile.println(state);
-    Serial.println("Gravou!");
-
-    rFile.close();
+  rFile.close();
 }
 
-String readFile(String path)
+void readFile(String path)
 {
-    Serial.println("Read file");
-    File rFile = SPIFFS.open(path, "r"); // r+ leitura e escrita
-    if (!rFile)
+  Serial.println("Read file");
+
+  File rFile = SPIFFS.open(path, "r"); // r+ leitura e escrita
+
+  if (!rFile)
+  {
+    Serial.println("Erro ao abrir arquivo!");
+
+    return;
+  }
+
+  else
+  {
+    Serial.print("---------- Lendo arquivo ");
+
+    Serial.print(path);
+
+    Serial.println("  ---------");
+    while (rFile.position() < rFile.size())
     {
-        Serial.println("Erro ao abrir arquivo!");
-        String s = "";
-        return s;
+      String line = rFile.readStringUntil('\n'); // Lê uma linha do arquivo
+      Serial.println(line);
+      filaDeStrings.push(line);
     }
-    else
-    {
-        Serial.print("---------- Lendo arquivo " + path + "  ---------");
-        String s = "";
-        while (rFile.position() < rFile.size())
-        {
-            String line = rFile.readStringUntil('\n'); // Lê uma linha do arquivo
-            Serial.println(line);
-            s = line;
-        }
-        rFile.close();
-        return s;
-    }
+
+    rFile.close();
+  }
 }
 
 void formatFile()
 {
-    SPIFFS.format();
-    Serial.println("Formatou SPIFFS!");
+  SPIFFS.format();
+  Serial.println("Formatou SPIFFS");
 }
 
 void openFS(void)
 {
-    if (!SPIFFS.begin())
-        Serial.println("\nErro ao abrir o sistema de arquivos");
-    else
-        Serial.println("\nSistema de arquivos aberto com sucesso!");
+  if (!SPIFFS.begin())
+    Serial.println("\nErro ao abrir o sistema de arquivos");
+  else
+    Serial.println("\nSistema de arquivos aberto com sucesso!");
 }
