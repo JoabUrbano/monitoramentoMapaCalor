@@ -1,8 +1,20 @@
-#include "DHT.h"
-#include <stdlib.h>
+#define SERIALOUT 14
+#define TXONLY
+
+#ifdef TXONLY
+#include <TXOnlySerial.h>
+
+TXOnlySerial mySerial(SERIALOUT); // TX
+#endif
+
+#ifdef SWSERIAL
 #include <SoftwareSerial.h>
 
-SoftwareSerial coletorDados(A9, A10); // A9 receptor e A10 transmissor
+SoftwareSerial mySerial(SERIALOUT + 1, SERIALOUT); // TX
+#endif
+
+#include "DHT.h"
+#include <stdlib.h>
 
 /* Struct que armazenará os dados */
 
@@ -56,7 +68,6 @@ void setup()
 
   Serial.println("Sensores iniciados!");
 
-  coletorDados.begin(9600);
 }
 
 void loop()
@@ -144,15 +155,13 @@ void loop()
   }
 
   // Começar a comunicação serial aqui
-  if(coletorDados.available())
-  {
-    Serial.write(coletorDados.read());
-  }
-  if(Serial.available())
-  {
-    coletorDados.write("a");
-  }
+  // Envie dados para o ESP32
+  char data = 'a';
+  mySerial.write(data);
+  delay(2500);
+  Serial.println("enviou a");
 
+  /* Imprimir sensores */
   Serial.println("----------------------------------------------------------------------------");
   Serial.println("DHT 01");
   Serial.println(dados01.funcionando);

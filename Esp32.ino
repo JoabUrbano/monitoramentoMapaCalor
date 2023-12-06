@@ -11,10 +11,6 @@
 
 std::queue<String> filaDeStrings;
 
-#define RXpin 16
-#define TXpin 17
-HardwareSerial transmissor(1);
-
 /* Variáveis para conexão MQTT */
 
 WiFiClient wifi_client;
@@ -56,95 +52,92 @@ void readFile(String path);
 void formatFile();
 void openFS(void);
 
-
-
 void setup()
 {
-    Serial.begin(9600);
+  Serial.begin(9600);
 
-    /* Variáveis para conexão MQTT */
+  /* Variáveis para conexão MQTT */
 
-    WiFi.mode(WIFI_STA); //"station mode": permite o ESP32 ser um cliente da rede WiFi
-    WiFi.begin(wifi_ssid, wifi_password);
-    connectWiFi();
-    mqtt_client.setServer(mqtt_broker, mqtt_port);
+  WiFi.mode(WIFI_STA); //"station mode": permite o ESP32 ser um cliente da rede WiFi
+  WiFi.begin(wifi_ssid, wifi_password);
+  connectWiFi();
+  mqtt_client.setServer(mqtt_broker, mqtt_port);
 
-    transmissor.begin(9600);
+  // formatFile(); // Apenas a primeira vez que gravar o código
 
-    // formatFile(); // Apenas a primeira vez que gravar o código
+  Serial.println("Abrir arquivo");
+  openFS();
 
-    Serial.println("Abrir arquivo");
-    openFS();
-
-    ntp.begin();       // Inicia o protocolo
-    ntp.forceUpdate(); // Atualização
+  ntp.begin();       // Inicia o protocolo
+  ntp.forceUpdate(); // Atualização
 }
-
-
 
 void loop()
 {
-    // Verificando conexão
-    if (!mqtt_client.connected()) // Se MQTT não estiver conectado
-        connectMQTT();            // Tente se conectar ao broker
+  // Verificando conexão
+  if (!mqtt_client.connected()) // Se MQTT não estiver conectado
+    connectMQTT();              // Tente se conectar ao broker
 
-    if (mqtt_client.connected())
-        mqtt_client.loop();
+  if (mqtt_client.connected())
+    mqtt_client.loop();
 
-    // Faz a publicação dos valores de temperatura e umidade dos sensores e suas médias
-    // temperaturaTopico01.publish(temperatura01);
+  // Faz a publicação dos valores de temperatura e umidade dos sensores e suas médias
+  // temperaturaTopico01.publish(temperatura01);
 
-    // Começar a comunicação serial aqui
-    if (transmissor.available())
-        Serial.write(transmissor.read());
+  // Começar a comunicação serial aqui
+  // Leia dados do Arduino Mega
 
-    if (Serial.available())
-        transmissor.write(Serial.read());
-    delay(1000);
+  if (Serial2.available())
+  {
+    char data = Serial2.read();
+    Serial.print("Messagem recebida: ");
+    Serial.println(data);
+  }
+  delay(1000);
 }
 
 // Função para conectar o Esp ao Wifi
 void connectWiFi()
 {
-    Serial.print("Conectando à rede WiFi .. ");
+  Serial.print("Conectando à rede WiFi .. ");
 
-    unsigned long tempoInicial = millis();
-    while (WiFi.status() != WL_CONNECTED && (millis() - tempoInicial < wifi_timeout))
-    {
-        Serial.print(".");
-        delay(100);
-    }
-    Serial.println();
+  unsigned long tempoInicial = millis();
+  while (WiFi.status() != WL_CONNECTED && (millis() - tempoInicial < wifi_timeout))
+  {
+    Serial.print(".");
+    delay(100);
+  }
+  Serial.println();
 
-    if (WiFi.status() != WL_CONNECTED)
-        Serial.println("Conexão com WiFi falhou!");
-    else
-    {
-        Serial.print("Conectado com o IP: ");
-        Serial.println(WiFi.localIP());
-    }
+  if (WiFi.status() != WL_CONNECTED)
+    Serial.println("Conexão com WiFi falhou!");
+  else
+  {
+    Serial.print("Conectado com o IP: ");
+    Serial.println(WiFi.localIP());
+  }
 }
 
 /* Função para conexão no broker MQTT */
 void connectMQTT()
 {
-    unsigned long tempoInicial = millis();
-    while (!mqtt_client.connected() && (millis() - tempoInicial < mqtt_timeout))
+  unsigned long tempoInicial = millis();
+  while (!mqtt_client.connected() && (millis() - tempoInicial < mqtt_timeout))
+  {
+    if (WiFi.status() != WL_CONNECTED)
+      connectWiFi();
+
+    Serial.println("Conectando ao MQTT Broker..");
+
+    if (mqtt_client.connect("ESP32Client", mqtt_usernameAdafruitIO, mqtt_keyAdafruitIO))
+      Serial.print("Conectado ao broker MQTT!");
+    else
     {
-        if (WiFi.status() != WL_CONNECTED)
-            connectWiFi();
-
-        Serial.println("Conectando ao MQTT Broker..");
-
-        if (mqtt_client.connect("ESP32Client", mqtt_usernameAdafruitIO, mqtt_keyAdafruitIO))
-            Serial.print("Conectado ao broker MQTT!");
-        else
-        {
-            Serial.print("Conexão com o broker MQTT falhou!");
-            delay(500);
-        }
+      Serial.print("Conexão com o broker MQTT falhou!");
+      delay(500);
     }
-    Serial.println();
+  }
+  Serial.println();
 }
 
 /* Funções de interação arquivos ESP */
@@ -155,7 +148,7 @@ void writeFile(String state, String path, String hora)
   {
     filaDeStrings.pop();
   }
-  
+
   readFile(path);
   File rFile = SPIFFS.open(path, "w");
 
