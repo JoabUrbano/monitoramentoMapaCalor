@@ -17,7 +17,6 @@ Projeto que visa monitorar ambientes e produzir dados para mapas de calor. Os se
 - Adafruit Unified Sensor<br>
 - Esp32<br>
 - Wifi<br>
-- NTPClient<br>
 - Adafruit MQTT Library<br>
 - SPIFFS<br>
 - Fs<br>
